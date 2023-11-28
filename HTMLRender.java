@@ -21,7 +21,7 @@ import java.util.Scanner;
  *		<pre>, </pre> - Preformatted text
  *
  *	@author Aditi Chamarthy
- *	@since November 20. 2023
+ *	@since November 16. 2023
  */
 public class HTMLRender {
 	
@@ -123,11 +123,20 @@ public class HTMLRender {
 	private void printRender(){
 		boolean ifBold = false;
 		boolean ifItalic = false;
+		int letterCount = 0;
+		String header = "none";
+		String headerLine = " ";
 		
 		
 		for(int i = 0; i < tokens.length; i++){
 			if(tokens[i].equalsIgnoreCase("<b>")){
 				ifBold = true;
+			}
+			else if(tokens[i].equalsIgnoreCase("<html>")||tokens[i].equalsIgnoreCase("<body>")){
+				
+			}
+			else if(tokens[i].equalsIgnoreCase("</html>")||tokens[i].equalsIgnoreCase("</body>")){
+				
 			}
 			else if(tokens[i].equalsIgnoreCase("</b>")){
 				ifBold = false;
@@ -147,16 +156,53 @@ public class HTMLRender {
 			else if(tokens[i].equalsIgnoreCase("<hr>")){
 				browser.printHorizontalRule();
 			}
+			else if(tokens[i].indexOf("<h") != -1 || tokens[i].indexOf("<H") != -1){
+				header = tokens[i].substring(1,3);
+				browser.println();
+			}
+			else if(tokens[i].indexOf("</h") != -1 || tokens[i].indexOf("</H") != -1){
+				
+				if(header.equalsIgnoreCase("h1")){
+					browser.printHeading1(headerLine);
+				}
+				else if(header.equalsIgnoreCase("h2")){
+					browser.printHeading2(headerLine);
+				}
+				else if(header.equalsIgnoreCase("h3")){
+					browser.printHeading3(headerLine);
+				}
+				else if(header.equalsIgnoreCase("h4")){
+					browser.printHeading4(headerLine);
+				}
+				else if(header.equalsIgnoreCase("h5")){
+					browser.printHeading5(headerLine);
+				}
+				else{
+					browser.printHeading6(headerLine);
+				}
+				header = "none";
+			}
 			else{
+				letterCount += tokens[i].length();
 				if(ifBold){
 					browser.printBold(tokens[i]);
 				}
 				else if(ifItalic){
 					browser.printItalic(tokens[i]);
 				}
+				else if(!header.equals("none")){
+					headerLine += tokens[i] + " ";
+				}
+				else{
+					browser.print(tokens[i]);
+				}
 			}
 					
 			browser.print(" ");
+			if(letterCount == 80){
+				browser.println();
+				letterCount = 0;
+			}
 		}
 	}
 }
